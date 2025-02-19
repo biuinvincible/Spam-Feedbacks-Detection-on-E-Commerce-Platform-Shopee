@@ -1,0 +1,27 @@
+model_variants:
+  default:
+    embedding_dim: 128
+    num_filters: 100
+    filter_sizes: [3, 4, 5]
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 10
+
+  variant_1:
+    embedding_dim: 256
+    num_filters: 100
+    filter_sizes: [3, 4, 5]
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 15
+
+  variant_2:
+    embedding_dim: 512
+    num_filters: 100
+    filter_sizes: [3, 4, 5]
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 20

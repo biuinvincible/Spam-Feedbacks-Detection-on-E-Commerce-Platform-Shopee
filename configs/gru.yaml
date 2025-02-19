@@ -1,0 +1,30 @@
+model_variants:
+  default:
+    hidden_size: 64
+    num_layers: 1
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 10
+    optimizer: "adam"
+    loss_function: "binary_cross_entropy"
+
+  variant_1:
+    hidden_size: 128
+    num_layers: 1
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 15
+    optimizer: "adam"
+    loss_function: "binary_cross_entropy"
+
+  variant_2:
+    hidden_size: 256
+    num_layers: 2
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 20
+    optimizer: "adam"
+    loss_function: "binary_cross_entropy"
