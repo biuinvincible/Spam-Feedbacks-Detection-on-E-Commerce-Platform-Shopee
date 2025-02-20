@@ -7,6 +7,14 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from torch.utils.data import DataLoader, TensorDataset
 import mlflow
 from utils import EarlyStopping
+from pathlib import Path
+
+# Định nghĩa đường dẫn thư mục gốc
+BASE_DIR = Path(__file__).resolve().parent.parent
+CONFIG_PATH = BASE_DIR / "configs/cnn.yaml"
+DATA_PATH = BASE_DIR / "data/processed"
+MODEL_PATH = BASE_DIR / "models"
+REQUIREMENTS_PATH = BASE_DIR / "requirements.txt"
 
 # Kiểm tra và set device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -14,15 +22,15 @@ device = torch.device('cpu')  # Forcing CPU
 print(f"Using device: {device}")
 
 # Load config
-with open("/mnt/d/shopee_spam_detection/configs/cnn.yaml", "r") as f:
+with open(CONFIG_PATH, "r") as f:
     config_cnn = yaml.safe_load(f)
 
 # Load preprocessed data
-X_train = np.load("/mnt/d/shopee_spam_detection/data/processed/cnn_X_train.npy")
-X_test = np.load("/mnt/d/shopee_spam_detection/data/processed/cnn_X_test.npy")
-y_train = np.load("/mnt/d/shopee_spam_detection/data/processed/cnn_y_train.npy")
-y_test = np.load("/mnt/d/shopee_spam_detection/data/processed/cnn_y_test.npy")
-vocab_info = np.load("/mnt/d/shopee_spam_detection/data/processed/cnn_vocab_info.npy", allow_pickle=True).item()
+X_train = np.load(DATA_PATH / "cnn_X_train.npy")
+X_test = np.load(DATA_PATH / "cnn_X_test.npy")
+y_train = np.load(DATA_PATH / "cnn_y_train.npy")
+y_test = np.load(DATA_PATH / "cnn_y_test.npy")
+vocab_info = np.load(DATA_PATH / "cnn_vocab_info.npy", allow_pickle=True).item()
 vocab_size = vocab_info["vocab_size"]
 pad_idx = vocab_info["pad_idx"]
 
@@ -113,16 +121,16 @@ def train_model(model, params, model_name):
             print(f"Epoch {epoch+1}/{params['epochs']} - Loss: {avg_loss:.4f} - Val Loss: {val_loss:.4f} - Acc: {accuracy:.4f} - F1: {f1:.4f}")
             
             # Early stopping
-            model_path = f"/mnt/d/shopee_spam_detection/models/{model_name}_model.pt"
-            early_stopping(val_loss, model, model_path)
+            model_save_path = MODEL_PATH / f"{model_name}_model.pt"
+            early_stopping(val_loss, model, model_save_path)
             if early_stopping.early_stop:
                 print("Early stopping triggered")
                 break
         
         # Load best model for final logging
-        model.load_state_dict(torch.load(model_path))
+        model.load_state_dict(torch.load(model_save_path))
         input_example = X_train_tensor[:1].cpu().numpy()
-        mlflow.pytorch.log_model(model, f"{model_name}_model", input_example=input_example, pip_requirements="/mnt/d/shopee_spam_detection/requirements.txt")
+        mlflow.pytorch.log_model(model, f"{model_name}_model", input_example=input_example, pip_requirements=REQUIREMENTS_PATH)
 
 # Train all model variants
 for variant_name, params in config_cnn["model_variants"].items():

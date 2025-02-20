@@ -1,0 +1,6 @@
+artifact_location: file:///mnt/d/shopee_spam_detection/src/mlruns/215844578140675878
+creation_time: 1740034537353
+experiment_id: '215844578140675878'
+last_update_time: 1740034537353
+lifecycle_stage: active
+name: xgboost_experiment

@@ -6,7 +6,7 @@ from nltk import word_tokenize
 import torch
 import py_vncorenlp
 from py_vncorenlp import VnCoreNLP
-os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-11-openjdk-amd64"
+os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-17-openjdk-amd64"
 
 # Class for early stopping
 class EarlyStopping:
@@ -56,8 +56,11 @@ class EarlyStopping:
         self.min_validation_loss = val_loss
 
 # Load VnCoreNLP models
-py_vncorenlp.download_model(save_dir="/mnt/d/VnCoreNLP-master")
-model = py_vncorenlp.VnCoreNLP(save_dir="/mnt/d/VnCoreNLP-master")
+VNCORP_PATH = os.path.join(os.path.dirname(__file__), "VnCoreNLP-master")
+# Tải model (nếu cần)
+py_vncorenlp.download_model(save_dir=VNCORP_PATH)
+# Load model
+model = py_vncorenlp.VnCoreNLP(save_dir=VNCORP_PATH)
 
 def load_bert():
     v_phobert = AutoModel.from_pretrained('vinai/phobert-base')

@@ -1,0 +1,6 @@
+artifact_location: file:///mnt/d/shopee_spam_detection/src/VnCoreNLP-master/mlruns/238992104388196125
+creation_time: 1740034415170
+experiment_id: '238992104388196125'
+last_update_time: 1740034415170
+lifecycle_stage: active
+name: shopee_spam_lstm

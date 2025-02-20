@@ -1,0 +1,15 @@
+artifact_uri: file:///mnt/d/shopee_spam_detection/src/VnCoreNLP-master/mlruns/238992104388196125/64c92a10393742f981c2c7f98e5c798e/artifacts
+end_time: 1740034482591
+entry_point_name: ''
+experiment_id: '238992104388196125'
+lifecycle_stage: active
+run_id: 64c92a10393742f981c2c7f98e5c798e
+run_name: variant_1
+run_uuid: 64c92a10393742f981c2c7f98e5c798e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740034464263
+status: 3
+tags: []
+user_id: root

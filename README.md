@@ -18,6 +18,7 @@ Shopee_Spam_Detection/
 │   ├── train_lstm.py   # Train LSTM model
 │   ├── train_xgboost.py # Train XGBoost model
 │   ├── preprocessing.py # Preprocess the dataset
+│   ├── VnCoreNLP-master/ # VnCoreNLP module for NLP tasks
 │── pipeline.py         # Runs all training scripts sequentially
 │── requirements.txt    # Required dependencies
 │── Dockerfile          # Docker container setup
@@ -27,6 +28,7 @@ Shopee_Spam_Detection/
 │   ├── utils.py        # Helper functions
 │   ├── Dockerfile      # Docker setup for API
 │   ├── requirements.txt # Dependencies for API
+│   ├── VnCoreNLP-master/ # VnCoreNLP module for NLP tasks
 ```
 
 ## Setup
@@ -69,4 +71,3 @@ Then open `http://localhost:5000` in your browser.
 
 ## Contact
 For any questions, feel free to ask me via https://www.facebook.com/anh.khoa.468258/.
-

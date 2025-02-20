@@ -6,24 +6,30 @@ import mlflow
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import MinMaxScaler
 import joblib  # Thêm thư viện joblib để lưu scaler
+from pathlib import Path
+
+# Xác định thư mục gốc của dự án
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load config
-with open("/mnt/d/shopee_spam_detection/configs/xgboost.yaml", "r") as f:
+config_path = BASE_DIR / "configs/xgboost.yaml"
+with open(config_path, "r") as f:
     config = yaml.safe_load(f)
 
 # Load data
-X_train = np.load("/mnt/d/shopee_spam_detection/data/processed/xgboost_X_train.npy")
-X_test = np.load("/mnt/d/shopee_spam_detection/data/processed/xgboost_X_test.npy")
-y_train = np.load("/mnt/d/shopee_spam_detection/data/processed/xgboost_y_train.npy")
-y_test = np.load("/mnt/d/shopee_spam_detection/data/processed/xgboost_y_test.npy")
+data_dir = BASE_DIR / "data/processed"
+X_train = np.load(data_dir / "xgboost_X_train.npy")
+X_test = np.load(data_dir / "xgboost_X_test.npy")
+y_train = np.load(data_dir / "xgboost_y_train.npy")
+y_test = np.load(data_dir / "xgboost_y_test.npy")
 
 # Chuẩn hóa dữ liệu với MinMaxScaler
 scaler = MinMaxScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-# Lưu scaler vào đường dẫn D:\SHOPEE_Spam_Detection\models
-scaler_path = "/mnt/d/shopee_spam_detection/models/XGBoost_scaler.pkl"  # Đường dẫn để lưu scaler
+# Lưu scaler
+scaler_path = BASE_DIR / "models/XGBoost_scaler.pkl"
 joblib.dump(scaler, scaler_path)
 print(f"Scaler saved to {scaler_path}")
 
@@ -47,10 +53,11 @@ for variant_name, params in config["model_variants"].items():
         input_example = X_train[:1]
         mlflow.log_params(params)
         mlflow.log_metric("accuracy", accuracy)
-        mlflow.xgboost.log_model(model, f"xgboost_model_{variant_name}", input_example=input_example, pip_requirements="/mnt/d/shopee_spam_detection/requirements.txt")
+        mlflow.xgboost.log_model(model, f"xgboost_model_{variant_name}", input_example=input_example, pip_requirements=str(BASE_DIR / "requirements.txt"))
         
         # Lưu mô hình ra file
-        model.save_model(f"/mnt/d/shopee_spam_detection/models/xgboost_{variant_name}.json")
+        model_path = BASE_DIR / f"models/xgboost_{variant_name}.json"
+        model.save_model(model_path)
         
         print(f"Accuracy for {variant_name}: {accuracy:.4f}")
         print(classification_report(y_test, y_pred))

@@ -1,0 +1,15 @@
+artifact_uri: file:///mnt/d/shopee_spam_detection/src/VnCoreNLP-master/mlruns/816792351336087752/90bbadf5e6b34af493f321a1ab029d87/artifacts
+end_time: 1740034266409
+entry_point_name: ''
+experiment_id: '816792351336087752'
+lifecycle_stage: active
+run_id: 90bbadf5e6b34af493f321a1ab029d87
+run_name: peaceful-rook-732
+run_uuid: 90bbadf5e6b34af493f321a1ab029d87
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740034241336
+status: 4
+tags: []
+user_id: root

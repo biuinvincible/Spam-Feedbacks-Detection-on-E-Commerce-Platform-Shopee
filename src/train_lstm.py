@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,19 +11,23 @@ from utils import EarlyStopping
 
 # Kiểm tra thiết bị
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-device = torch.device("cpu")  # Forcing CPU
 print(f"Using device: {device}")
 
+# Xác định thư mục gốc của dự án
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # Một cấp trên thư mục chứa file hiện tại
+
 # Load config
-with open("/mnt/d/shopee_spam_detection/configs/lstm.yaml", "r") as f:
+config_path = os.path.join(BASE_DIR, "configs", "lstm.yaml")
+with open(config_path, "r") as f:
     config = yaml.safe_load(f)
 
 # Load preprocessed data
-X_train = np.load("/mnt/d/shopee_spam_detection/data/processed/lstm_X_train.npy")
-X_test = np.load("/mnt/d/shopee_spam_detection/data/processed/lstm_X_test.npy")
-y_train = np.load("/mnt/d/shopee_spam_detection/data/processed/lstm_y_train.npy")
-y_test = np.load("/mnt/d/shopee_spam_detection/data/processed/lstm_y_test.npy")
-vocab_info = np.load("/mnt/d/shopee_spam_detection/data/processed/lstm_vocab_info.npy", allow_pickle=True).item()
+data_dir = os.path.join(BASE_DIR, "data", "processed")
+X_train = np.load(os.path.join(data_dir, "lstm_X_train.npy"))
+X_test = np.load(os.path.join(data_dir, "lstm_X_test.npy"))
+y_train = np.load(os.path.join(data_dir, "lstm_y_train.npy"))
+y_test = np.load(os.path.join(data_dir, "lstm_y_test.npy"))
+vocab_info = np.load(os.path.join(data_dir, "lstm_vocab_info.npy"), allow_pickle=True).item()
 
 vocab_size = vocab_info["vocab_size"]
 pad_idx = vocab_info["pad_idx"]
@@ -117,7 +122,7 @@ for variant_name, params in config["model_variants"].items():
             print(f"[{variant_name}] Epoch {epoch+1}/{params['epochs']} - Loss: {avg_loss:.4f} - Val Loss: {val_loss:.4f} - Acc: {accuracy:.4f} - F1: {f1:.4f}")
             
             # Early stopping
-            model_path = f"/mnt/d/shopee_spam_detection/models/lstm_{variant_name}.pt"
+            model_path = os.path.join(BASE_DIR, "models", f"lstm_{variant_name}.pt")
             early_stopping(val_loss, model, model_path)
             if early_stopping.early_stop:
                 print("Early stopping triggered")
@@ -126,6 +131,8 @@ for variant_name, params in config["model_variants"].items():
         # Load best model for final logging
         model.load_state_dict(torch.load(model_path))
         input_example = X_train_tensor[:1].cpu().numpy()
-        mlflow.pytorch.log_model(model, f"lstm_model_{variant_name}", pip_requirements="/mnt/d/shopee_spam_detection/requirements.txt", input_example=input_example)
+        mlflow.pytorch.log_model(model, f"lstm_model_{variant_name}", 
+            pip_requirements=os.path.join(BASE_DIR, "requirements.txt"), 
+            input_example=input_example)
 
 print("Training complete for all model variants!")
