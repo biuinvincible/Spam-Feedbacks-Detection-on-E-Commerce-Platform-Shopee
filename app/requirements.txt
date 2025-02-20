@@ -1,0 +1,14 @@
+fastapi==0.115.8
+uvicorn==0.34.0
+xgboost==2.1.4
+scikit-learn==1.6.1
+numpy==1.26.4
+pydantic==2.10.5
+joblib==1.4.2
+torch==1.13.0
+setuptools==65.5.1
+py_vncorenlp==0.1.4
+transformers==4.49.0
+pandas==2.2.2
+joblib==1.4.2
+nltk==3.9.1
