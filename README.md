@@ -22,6 +22,11 @@ Shopee_Spam_Detection/
 │── requirements.txt    # Required dependencies
 │── Dockerfile          # Docker container setup
 │── README.md           # Project documentation
+│── app/                # FastAPI application
+│   ├── app.py          # FastAPI server
+│   ├── utils.py        # Helper functions
+│   ├── Dockerfile      # Docker setup for API
+│   ├── requirements.txt # Dependencies for API
 ```
 
 ## Setup
@@ -40,10 +45,19 @@ python src/preprocessing.py
 python pipeline.py
 ```
 
-### 4. Run with Docker
+### 4. Run FastAPI Application
+#### a) Run locally
 ```bash
-docker build -t shopee_spam_detection .
-docker run --rm shopee_spam_detection
+cd app
+uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+```
+Then open `http://localhost:8000/docs` to access the API documentation.
+
+#### b) Run with Docker
+```bash
+cd app
+docker build -t shopee_spam_api .
+docker run -p 8000:8000 shopee_spam_api
 ```
 
 ## Tracking with MLflow
@@ -55,3 +69,4 @@ Then open `http://localhost:5000` in your browser.
 
 ## Contact
 For any questions, feel free to ask me via https://www.facebook.com/anh.khoa.468258/.
+
