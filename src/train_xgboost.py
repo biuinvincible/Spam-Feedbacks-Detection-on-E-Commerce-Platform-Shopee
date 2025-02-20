@@ -5,6 +5,7 @@ import numpy as np
 import mlflow
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import MinMaxScaler
+import joblib  # Thêm thư viện joblib để lưu scaler
 
 # Load config
 with open("/mnt/d/shopee_spam_detection/configs/xgboost.yaml", "r") as f:
@@ -20,6 +21,11 @@ y_test = np.load("/mnt/d/shopee_spam_detection/data/processed/xgboost_y_test.npy
 scaler = MinMaxScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
+
+# Lưu scaler vào đường dẫn D:\SHOPEE_Spam_Detection\models
+scaler_path = "/mnt/d/shopee_spam_detection/models/XGBoost_scaler.pkl"  # Đường dẫn để lưu scaler
+joblib.dump(scaler, scaler_path)
+print(f"Scaler saved to {scaler_path}")
 
 # Bắt đầu logging với MLflow
 mlflow.set_experiment("xgboost_experiment")
