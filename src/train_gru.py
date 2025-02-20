@@ -5,26 +5,33 @@ import numpy as np
 import yaml
 import mlflow
 import mlflow.pytorch
+import os
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from torch.utils.data import DataLoader, TensorDataset
 from utils import EarlyStopping
 
 # Check for CUDA
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-device = torch.device("cpu")  # Forcing CPU
 print(f"Using device: {device}")
 
+# Define relative paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Lấy đường dẫn thư mục chứa script này
+CONFIG_PATH = os.path.join(BASE_DIR, "configs", "gru.yaml")
+DATA_DIR = os.path.join(BASE_DIR, "data", "processed")
+MODEL_DIR = os.path.join(BASE_DIR, "models")
+REQ_PATH = os.path.join(BASE_DIR, "requirements.txt")
+
 # Load config
-with open("/mnt/d/shopee_spam_detection/configs/gru.yaml", "r") as f:
+with open(CONFIG_PATH, "r") as f:
     config = yaml.safe_load(f)
 
 # Load preprocessed data
-X_train = np.load("/mnt/d/shopee_spam_detection/data/processed/gru_X_train.npy")
-X_test = np.load("/mnt/d/shopee_spam_detection/data/processed/gru_X_test.npy")
-y_train = np.load("/mnt/d/shopee_spam_detection/data/processed/gru_y_train.npy")
-y_test = np.load("/mnt/d/shopee_spam_detection/data/processed/gru_y_test.npy")
-vocab_info = np.load("/mnt/d/shopee_spam_detection/data/processed/gru_vocab_info.npy", allow_pickle=True).item()
-vocab = torch.load("/mnt/d/shopee_spam_detection/data/processed/gru_vocab.pth")
+X_train = np.load(os.path.join(DATA_DIR, "gru_X_train.npy"))
+X_test = np.load(os.path.join(DATA_DIR, "gru_X_test.npy"))
+y_train = np.load(os.path.join(DATA_DIR, "gru_y_train.npy"))
+y_test = np.load(os.path.join(DATA_DIR, "gru_y_test.npy"))
+vocab_info = np.load(os.path.join(DATA_DIR, "gru_vocab_info.npy"), allow_pickle=True).item()
+vocab = torch.load(os.path.join(DATA_DIR, "gru_vocab.pth"))
 
 vocab_size = vocab_info["vocab_size"]
 pad_idx = vocab_info["pad_idx"]
@@ -118,7 +125,7 @@ for variant_name, params in config["model_variants"].items():
             print(f"Variant {variant_name} - Epoch {epoch+1}/{params['epochs']} - Loss: {avg_loss:.4f} - Val Loss: {val_loss:.4f} - Acc: {accuracy:.4f} - F1: {f1:.4f}")
             
             # Early stopping
-            model_path = f"/mnt/d/shopee_spam_detection/models/gru_model_{variant_name}.pt"
+            model_path = os.path.join(MODEL_DIR, f"gru_model_{variant_name}.pt")
             early_stopping(val_loss, model, model_path)
             if early_stopping.early_stop:
                 print("Early stopping triggered")
@@ -127,6 +134,6 @@ for variant_name, params in config["model_variants"].items():
         # Load best model for final logging
         model.load_state_dict(torch.load(model_path))
         input_example = X_train_tensor[:1].cpu().numpy()
-        mlflow.pytorch.log_model(model, f"gru_model_{variant_name}", input_example=input_example, pip_requirements="/mnt/d/shopee_spam_detection/requirements.txt")
+        mlflow.pytorch.log_model(model, f"gru_model_{variant_name}", input_example=input_example, pip_requirements=REQ_PATH)
 
 print("Training complete!")
