@@ -1,0 +1,15 @@
+artifact_uri: file:///mnt/d/shopee_spam_detection/src/mlruns/676077507423215688/679ca43565e84a61bd3fc0dd1a5354dc/artifacts
+end_time: 1740002788166
+entry_point_name: ''
+experiment_id: '676077507423215688'
+lifecycle_stage: active
+run_id: 679ca43565e84a61bd3fc0dd1a5354dc
+run_name: default
+run_uuid: 679ca43565e84a61bd3fc0dd1a5354dc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740002756033
+status: 3
+tags: []
+user_id: root
