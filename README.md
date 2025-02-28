@@ -66,7 +66,7 @@ docker run -p 8000:8000 shopee_spam_api
 ## Tracking with MLflow
 To monitor experiment results:
 ```bash
-mlflow ui --host 0.0.0.0 --port 5000
+mlflow ui --backend-store-uri src/mlruns
 ```
 Then open `http://localhost:5000` in your browser.
 
