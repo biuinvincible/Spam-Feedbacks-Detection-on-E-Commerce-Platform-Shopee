@@ -15,7 +15,7 @@ print(f"Using device: {device}")
 
 # Xác định thư mục gốc của dự án
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # Một cấp trên thư mục chứa file hiện tại
-MLRUNS_DIR = os.path.join(BASE_DIR, "mlruns")  # Thư mục mlruns cùng cấp
+MLRUNS_DIR = os.path.join(BASE_DIR, "mlruns")  
 mlflow.set_tracking_uri(f"file://{MLRUNS_DIR}")
 
 # Load config
@@ -133,8 +133,10 @@ for variant_name, params in config["model_variants"].items():
         # Load best model for final logging
         model.load_state_dict(torch.load(model_path))
         input_example = X_train_tensor[:1].cpu().numpy()
+        model.to("cpu")
         mlflow.pytorch.log_model(model, f"lstm_model_{variant_name}", 
             pip_requirements=os.path.join(BASE_DIR, "requirements.txt"), 
             input_example=input_example)
+        model.to(device)
 
 print("Training complete for all model variants!")

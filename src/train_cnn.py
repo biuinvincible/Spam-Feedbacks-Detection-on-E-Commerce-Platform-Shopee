@@ -8,19 +8,20 @@ from torch.utils.data import DataLoader, TensorDataset
 import mlflow
 from utils import EarlyStopping
 from pathlib import Path
+# torch.backends.cudnn.benchmark = False
+# torch.backends.cudnn.deterministic = True
 
 # Định nghĩa đường dẫn thư mục gốc
-BASE_DIR = Path(__file__).resolve().parent.parent
-CONFIG_PATH = BASE_DIR / "configs/cnn.yaml"
-DATA_PATH = BASE_DIR / "data/processed"
-MODEL_PATH = BASE_DIR / "models"
-REQUIREMENTS_PATH = BASE_DIR / "requirements.txt"
-MLRUNS_DIR = os.path.join(BASE_DIR, "mlruns")  # Thư mục mlruns cùng cấp
+BASE_DIR = str(Path(__file__).resolve().parent.parent)  # Chuyển BASE_DIR thành str
+CONFIG_PATH = str(Path(BASE_DIR) / "configs" / "cnn.yaml")
+DATA_PATH = Path(BASE_DIR) / "data" / "processed"
+MODEL_PATH = Path(BASE_DIR) / "models"
+REQUIREMENTS_PATH = str(Path(BASE_DIR) / "requirements.txt")
+MLRUNS_DIR = str(Path(BASE_DIR) / "mlruns")
 mlflow.set_tracking_uri(f"file://{MLRUNS_DIR}")
 
 # Kiểm tra và set device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = torch.device('cpu')  # Forcing CPU
 print(f"Using device: {device}")
 
 # Load config
@@ -132,7 +133,9 @@ def train_model(model, params, model_name):
         # Load best model for final logging
         model.load_state_dict(torch.load(model_save_path))
         input_example = X_train_tensor[:1].cpu().numpy()
+        model.to("cpu")
         mlflow.pytorch.log_model(model, f"{model_name}_model", input_example=input_example, pip_requirements=REQUIREMENTS_PATH)
+        model.to(device)
 
 # Train all model variants
 for variant_name, params in config_cnn["model_variants"].items():
