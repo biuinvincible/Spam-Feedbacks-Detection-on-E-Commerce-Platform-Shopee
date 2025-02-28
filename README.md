@@ -1,6 +1,6 @@
 # Shopee Spam Detection
 
-This project aims to classify spam comments in Shopee product reviews using multiple deep learning models (CNN, GRU, LSTM) and traditional machine learning (XGBoost). The training process is managed using MLflow for experiment tracking.
+This project aims to classify spam comments in Shopee product reviews using multiple deep learning models (CNN, GRU, LSTM), BERT (PhoBERT) and traditional machine learning (XGBoost). The training process is managed using MLflow for experiment tracking.
 
 ## Project Structure
 ```
@@ -17,6 +17,7 @@ Shopee_Spam_Detection/
 │   ├── train_gru.py    # Train GRU model
 │   ├── train_lstm.py   # Train LSTM model
 │   ├── train_xgboost.py # Train XGBoost model
+    ├── train_PhoBERT.py
 │   ├── preprocessing.py # Preprocess the dataset
 │   ├── VnCoreNLP-master/ # VnCoreNLP module for NLP tasks
 │── pipeline.py         # Runs all training scripts sequentially
@@ -69,5 +70,10 @@ mlflow ui --host 0.0.0.0 --port 5000
 ```
 Then open `http://localhost:5000` in your browser.
 
+## Fine-tuning PhoBERT
+For PhoBERT, you will have to run train_PhoBERT.py individually like:
+```bash
+python train_PhoBERT.py --batch_size 16 --epochs 3 --learning_rate 2e-5 --force_preprocess
+```
 ## Contact
 For any questions, feel free to ask me via https://www.facebook.com/anh.khoa.468258/.
