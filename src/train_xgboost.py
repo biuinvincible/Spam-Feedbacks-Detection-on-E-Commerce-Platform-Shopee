@@ -7,9 +7,12 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import MinMaxScaler
 import joblib  # Thêm thư viện joblib để lưu scaler
 from pathlib import Path
+import os
 
 # Xác định thư mục gốc của dự án
 BASE_DIR = Path(__file__).resolve().parent.parent
+MLRUNS_DIR = os.path.join(BASE_DIR, "mlruns")  # Thư mục mlruns cùng cấp
+mlflow.set_tracking_uri(f"file://{MLRUNS_DIR}")
 
 # Load config
 config_path = BASE_DIR / "configs/xgboost.yaml"

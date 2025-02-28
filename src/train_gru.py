@@ -20,6 +20,8 @@ CONFIG_PATH = os.path.join(BASE_DIR, "configs", "gru.yaml")
 DATA_DIR = os.path.join(BASE_DIR, "data", "processed")
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 REQ_PATH = os.path.join(BASE_DIR, "requirements.txt")
+MLRUNS_DIR = os.path.join(BASE_DIR, "mlruns")  # Thư mục mlruns cùng cấp
+mlflow.set_tracking_uri(f"file://{MLRUNS_DIR}")
 
 # Load config
 with open(CONFIG_PATH, "r") as f:
