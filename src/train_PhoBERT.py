@@ -29,6 +29,8 @@ from utils import (
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  
 DATA_DIR = os.path.join(BASE_DIR, "data", "raw", "labeled_data.csv")
 PROCESSED_DATA_DIR = os.path.join(BASE_DIR, "data", "processed")
+MLRUNS_DIR = os.path.join(BASE_DIR, "mlruns")  # Thư mục mlruns cùng cấp
+mlflow.set_tracking_uri(f"file://{MLRUNS_DIR}")
 
 def preprocess_data(input_path, max_length=128, force_preprocess=False):
     """
