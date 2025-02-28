@@ -15,6 +15,8 @@ CONFIG_PATH = BASE_DIR / "configs/cnn.yaml"
 DATA_PATH = BASE_DIR / "data/processed"
 MODEL_PATH = BASE_DIR / "models"
 REQUIREMENTS_PATH = BASE_DIR / "requirements.txt"
+MLRUNS_DIR = os.path.join(BASE_DIR, "mlruns")  # Thư mục mlruns cùng cấp
+mlflow.set_tracking_uri(f"file://{MLRUNS_DIR}")
 
 # Kiểm tra và set device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
