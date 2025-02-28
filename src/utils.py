@@ -55,12 +55,14 @@ class EarlyStopping:
         torch.save(model.state_dict(), model_path)
         self.min_validation_loss = val_loss
 
-# Load VnCoreNLP models
-VNCORP_PATH = os.path.join(os.path.dirname(__file__), "VnCoreNLP-master")
-# Tải model (nếu cần)
-py_vncorenlp.download_model(save_dir=VNCORP_PATH)
-# Load model
-model = py_vncorenlp.VnCoreNLP(save_dir=VNCORP_PATH)
+def load_vncorenlp():
+    # Load VnCoreNLP models
+    VNCORP_PATH = os.path.join(os.path.dirname(__file__), "VnCoreNLP-master")
+    # Tải model (nếu cần)
+    py_vncorenlp.download_model(save_dir=VNCORP_PATH)
+    # Load model
+    model = py_vncorenlp.VnCoreNLP(save_dir=VNCORP_PATH)
+    return model
 
 def load_bert():
     v_phobert = AutoModel.from_pretrained('vinai/phobert-base')
