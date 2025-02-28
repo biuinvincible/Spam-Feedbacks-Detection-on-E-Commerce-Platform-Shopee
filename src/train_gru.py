@@ -9,18 +9,19 @@ import os
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from torch.utils.data import DataLoader, TensorDataset
 from utils import EarlyStopping
+from pathlib import Path
 
 # Check for CUDA
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 # Define relative paths
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Lấy đường dẫn thư mục chứa script này
-CONFIG_PATH = os.path.join(BASE_DIR, "configs", "gru.yaml")
-DATA_DIR = os.path.join(BASE_DIR, "data", "processed")
-MODEL_DIR = os.path.join(BASE_DIR, "models")
-REQ_PATH = os.path.join(BASE_DIR, "requirements.txt")
-MLRUNS_DIR = os.path.join(BASE_DIR, "mlruns")  # Thư mục mlruns cùng cấp
+BASE_DIR = str(Path(__file__).resolve().parent.parent)  # Chuyển BASE_DIR thành str
+CONFIG_PATH = str(Path(BASE_DIR) / "configs" / "gru.yaml")
+DATA_DIR = str(Path(BASE_DIR) / "data" / "processed")
+MODEL_DIR = str(Path(BASE_DIR) / "models")
+REQ_PATH = str(Path(BASE_DIR) / "requirements.txt")
+MLRUNS_DIR = str(Path(BASE_DIR) / "mlruns")  
 mlflow.set_tracking_uri(f"file://{MLRUNS_DIR}")
 
 # Load config
@@ -136,6 +137,8 @@ for variant_name, params in config["model_variants"].items():
         # Load best model for final logging
         model.load_state_dict(torch.load(model_path))
         input_example = X_train_tensor[:1].cpu().numpy()
+        model.to("cpu")
         mlflow.pytorch.log_model(model, f"gru_model_{variant_name}", input_example=input_example, pip_requirements=REQ_PATH)
+        model.to(device)
 
 print("Training complete!")

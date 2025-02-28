@@ -7,11 +7,11 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import MinMaxScaler
 import joblib  # Thêm thư viện joblib để lưu scaler
 from pathlib import Path
-import os
+from pathlib import Path
 
 # Xác định thư mục gốc của dự án
-BASE_DIR = Path(__file__).resolve().parent.parent
-MLRUNS_DIR = os.path.join(BASE_DIR, "mlruns")  # Thư mục mlruns cùng cấp
+BASE_DIR = Path(__file__).resolve().parent.parent  # Chuyển BASE_DIR thành str
+MLRUNS_DIR = Path(BASE_DIR) / "mlruns"  
 mlflow.set_tracking_uri(f"file://{MLRUNS_DIR}")
 
 # Load config
