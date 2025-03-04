@@ -70,10 +70,5 @@ mlflow ui --backend-store-uri mlruns
 ```
 Then open `http://localhost:5000` in your browser.
 
-## Fine-tuning PhoBERT
-For PhoBERT, you will have to run train_PhoBERT.py individually like:
-```bash
-python train_PhoBERT.py --batch_size 16 --epochs 3 --learning_rate 2e-5 --force_preprocess
-```
 ## Contact
 For any questions, feel free to ask me via https://www.facebook.com/anh.khoa.468258/.
