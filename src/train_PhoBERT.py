@@ -3,6 +3,7 @@ import os
 import numpy as np
 import torch
 import torch.nn as nn
+import yaml
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import LRScheduler
 from sklearn.model_selection import train_test_split
@@ -258,62 +259,57 @@ def evaluate(model, dataloader, device, epoch=0):
     return avg_loss, accuracy, f1, precision, recall
 
 def main():
-    # Parse command line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--batch_size", type=int, default=16)
-    parser.add_argument("--epochs", type=int, default=3)
-    parser.add_argument("--learning_rate", type=float, default=2e-5)
-    parser.add_argument("--force_preprocess", action="store_true")
-    parser.add_argument("--patience", type=int, default=5, help="Patience for early stopping")
-    parser.add_argument("--model_name", type=str, default="phobert_base", help="Name for the experiment run")
-    args = parser.parse_args()
-    
+        # Load config
+    config_path = os.path.join(BASE_DIR, "configs", "phobert.yml")
+    with open(config_path, "r") as f:
+        config = yaml.safe_load(f)
+
+    # Lấy tham số từ config
+    params = config["model_variants"]["phobert_base"]
+    batch_size = params["batch_size"]
+    epochs = params["epochs"]
+    learning_rate = float(params["learning_rate"])
+    patience = params["patience"]
+    warmup_steps_ratio = params["warmup_steps_ratio"]
+    max_length = params["max_length"]
+    force_preprocess = params["force_preprocess"]
+
     # Check for GPU availability
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
-    
+
     # Preprocess data
-    train_data, test_data = preprocess_data(DATA_DIR, force_preprocess=args.force_preprocess)
-    
+    train_data, test_data = preprocess_data(DATA_DIR, max_length=max_length, force_preprocess=force_preprocess)
+
     # Create DataLoaders
-    train_dataloader, test_dataloader = create_dataloaders(train_data, test_data, batch_size=args.batch_size)
-    
+    train_dataloader, test_dataloader = create_dataloaders(train_data, test_data, batch_size=batch_size)
+
     # Initialize the model
     model = AutoModelForSequenceClassification.from_pretrained("vinai/phobert-base", num_labels=2).to(device)
-    
+
     # Initialize optimizer and scheduler
-    optimizer = AdamW(model.parameters(), lr=args.learning_rate)
-    total_steps = len(train_dataloader) * args.epochs
-    num_warmup_steps = int(0.1 * total_steps)  # 10% of total steps for warmup
+    optimizer = AdamW(model.parameters(), lr=learning_rate)
+    total_steps = len(train_dataloader) * epochs
+    num_warmup_steps = int(warmup_steps_ratio * total_steps)
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=total_steps)
-    
+
     # Initialize early stopping
     model_save_path = os.path.join(BASE_DIR, "models", "phobert_binary_classifier.pth")
     os.makedirs(os.path.dirname(model_save_path), exist_ok=True)
-    early_stopping = EarlyStopping(patience=args.patience, verbose=True)
-    
+    early_stopping = EarlyStopping(patience=patience, verbose=True)
+
     # Set up MLflow experiment
     mlflow.set_experiment("shopee_spam_phobert")
-    
+
     # Start MLflow run
-    with mlflow.start_run(run_name=args.model_name):
+    with mlflow.start_run(run_name="phobert_base"):
         # Log parameters
-        params = {
-            "model": "vinai/phobert-base",
-            "batch_size": args.batch_size,
-            "learning_rate": args.learning_rate,
-            "epochs": args.epochs,
-            "patience": args.patience,
-            "warmup_steps_ratio": 0.1,
-            "optimizer": "AdamW",
-            "scheduler": "LinearSchedulerWithWarmup"
-        }
         mlflow.log_params(params)
         
         # Training loop
         best_f1 = 0
-        for epoch in range(args.epochs):
-            print(f"Epoch {epoch + 1}/{args.epochs}")
+        for epoch in range(epochs):
+            print(f"Epoch {epoch + 1}/{epochs}")
             
             # Train the model
             train_loss, train_acc, train_f1, train_precision, train_recall = train(
@@ -362,15 +358,14 @@ def main():
         mlflow.log_metric("final_val_precision", final_precision)
         mlflow.log_metric("final_val_recall", final_recall)
         
-        # Save model to MLflow - FIX FOR INPUT EXAMPLE ERROR
+        # Save model to MLflow
         model.cpu()
         
         # Create a proper input example using numpy arrays instead of lists/dicts
-        # Take the first example from training data and convert to numpy arrays
         input_ids_np = train_data[0][0:1]  # Take first sample as numpy array
         attention_mask_np = train_data[1][0:1]  # Take first sample as numpy array
         
-        # Create a pandas DataFrame for the example input (MLflow PyTorch flavor supports DataFrame)
+        # Create a pandas DataFrame for the example input
         sample_df = pd.DataFrame({
             'input_ids': [input_ids_np[0].tolist()],  # Convert array to list for DataFrame
             'attention_mask': [attention_mask_np[0].tolist()]  # Convert array to list for DataFrame
